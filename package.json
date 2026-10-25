@@ -1,0 +1,26 @@
+{
+  "name": "teachergpt-school",
+  "version": "2.0.0",
+  "private": true,
+  "description": "УчительGPT 2.0 — AI workspace for teachers",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
+    "pdfkit": "^0.16.0",
+    "docx": "^9.5.1",
+    "multer": "^2.0.2",
+    "mammoth": "^1.9.1",
+    "pdf-parse": "^1.1.1",
+    "pptxgenjs": "^3.12.0"
+  }
+}

@@ -1,0 +1,13 @@
+[
+  {
+    "id": "c46b664b-0ed8-4ce5-8d30-ba85c2160c29",
+    "time": "2026-10-25T19:05:44.071Z",
+    "user": "Шарапов Марк Олегович",
+    "model": "subscription:pro",
+    "durationMs": 0,
+    "inputChars": 0,
+    "outputChars": 0,
+    "status": "success",
+    "error": "Запрос на подписку создан"
+  }
+]

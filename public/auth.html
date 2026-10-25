@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Вход — УчительGPT</title><link rel="stylesheet" href="/styles.css"></head>
+<body><main class="auth-screen"><section class="auth-card">
+  <div class="auth-brand"><span style="color:#d96c4b">✳</span> УчительGPT</div>
+  <h1 id="authTitle">С возвращением</h1>
+  <p class="auth-copy">ИИ-помощник для учителей и преподавателей школы «МБОУ „Центр образования „Перспектива“».</p>
+  <div class="auth-tabs"><button id="loginTab" class="active">Войти</button><button id="registerTab">Регистрация</button></div>
+  <form id="authForm">
+    <label class="field"><span>ФИО</span><input id="fullName" autocomplete="name" placeholder="Иванов Иван Иванович" required minlength="5" maxlength="100"></label>
+    <label class="field"><span>Пароль</span><input id="password" type="password" autocomplete="current-password" placeholder="Не менее 8 символов" required minlength="8" maxlength="128"></label>
+    <button class="primary-button" id="submitButton" type="submit">Войти</button>
+    <div class="auth-error" id="error" role="alert"></div>
+  </form>
+  <div class="auth-footer">Сделано специально для учителей школы<br><strong>«МБОУ „Центр образования „Перспектива“»</strong></div>
+</section></main>
+<script>
+const $=s=>document.querySelector(s);let mode="login";
+function setMode(next){mode=next;$("#loginTab").classList.toggle("active",mode==="login");$("#registerTab").classList.toggle("active",mode==="register");$("#authTitle").textContent=mode==="login"?"С возвращением":"Создайте аккаунт";$("#submitButton").textContent=mode==="login"?"Войти":"Зарегистрироваться";$("#password").autocomplete=mode==="login"?"current-password":"new-password";$("#error").textContent="";}
+$("#loginTab").onclick=()=>setMode("login");$("#registerTab").onclick=()=>setMode("register");
+$("#authForm").addEventListener("submit",async e=>{e.preventDefault();const button=$("#submitButton");button.disabled=true;button.textContent="Подождите…";$("#error").textContent="";try{const r=await fetch("/api/"+(mode==="login"?"login":"register"),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({fullName:$("#fullName").value,password:$("#password").value})});const d=await r.json();if(!r.ok)throw Error(d.error||"Не удалось выполнить запрос");location.href="/";}catch(err){$("#error").textContent=err.message;}finally{button.disabled=false;button.textContent=mode==="login"?"Войти":"Зарегистрироваться";}});
+fetch("/api/me").then(r=>r.json()).then(d=>{if(d.user)location.replace("/");}).catch(()=>{});
+</script></body></html>

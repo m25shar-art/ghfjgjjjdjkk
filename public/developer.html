@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Для разработчика — УчительGPT</title><link rel="stylesheet" href="/styles.css"></head>
+<body>
+<div id="loginView" class="dev-login"><section class="auth-card">
+  <div class="auth-brand"><span style="color:#d96c4b">✳</span> УчительGPT</div>
+  <h1>Для разработчика</h1><p class="auth-copy">Введите пароль для просмотра статистики и журнала запросов ИИ.</p>
+  <form id="devLogin"><label class="field"><span>Пароль разработчика</span><input id="devPassword" type="password" autocomplete="current-password" required autofocus></label><button class="primary-button" type="submit">Открыть панель</button><div class="auth-error" id="devError"></div></form>
+  <div class="auth-footer">Доступ к панели защищён серверной проверкой.</div>
+</section></div>
+<main id="dashboard" class="dev-wrap" hidden>
+  <header class="dev-header"><div><h1>Журнал запросов</h1><p>УчительGPT · AITunnel · Последние 5 000 записей</p></div><button class="share-button" id="back">← Вернуться в чат</button><button class="share-button" id="logout">Выйти</button></header>
+  <section class="stats-grid">
+    <div class="stat-card"><span>Запросов в журнале</span><strong id="totalRequests">0</strong></div>
+    <div class="stat-card"><span>Отправлено символов</span><strong id="totalInput">0</strong></div>
+    <div class="stat-card"><span>Получено символов</span><strong id="totalOutput">0</strong></div>
+    <div class="stat-card"><span>Суммарное время ожидания</span><strong id="totalDuration">0 с</strong></div>
+  </section>
+  <section class="subscription-admin"><h2>Подписки и запросы на активацию</h2><p>Подтверждайте тариф после получения оплаты наличными.</p><div id="subscriptionRows" class="subscription-rows">Загрузка…</div></section>
+  <div class="dev-actions"><input id="filter" placeholder="Поиск: ФИО или модель"><button id="refresh">Обновить</button><button id="export">Экспорт CSV</button><button id="clearFilter" class="right">Сбросить фильтр</button></div>
+  <div class="table-shell"><table><thead><tr><th>Время</th><th>Пользователь</th><th>Модель</th><th>Время ответа</th><th>Отправлено, симв.</th><th>Выдано, симв.</th><th>Статус</th><th>Ошибка</th></tr></thead><tbody id="rows"></tbody></table><div class="empty-logs" id="empty" hidden>Запросов пока нет.</div></div>
+</main>
+<div class="toast" id="toast"></div>
+<script>
+const $=s=>document.querySelector(s);let allLogs=[];let allUsers=[];
+function toast(s){const t=$("#toast");t.textContent=s;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2500);}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function duration(ms){return ms<1000?ms+" мс":(ms/1000).toFixed(2)+" с";}
+function fmtTime(s){return new Date(s).toLocaleString("ru-RU");}
+async function load(){try{const r=await fetch("/api/developer/logs");if(r.status===401){$("#loginView").hidden=false;$("#dashboard").hidden=true;return;}const d=await r.json();allLogs=d.logs||[];$("#loginView").hidden=true;$("#dashboard").hidden=false;$("#totalRequests").textContent=d.stats.requests.toLocaleString("ru-RU");$("#totalInput").textContent=d.stats.totalInput.toLocaleString("ru-RU");$("#totalOutput").textContent=d.stats.totalOutput.toLocaleString("ru-RU");$("#totalDuration").textContent=duration(d.stats.totalDuration);render();await loadSubscriptions();}catch{toast("Не удалось загрузить журнал.");}}
+async function loadSubscriptions(){try{const r=await fetch("/api/developer/subscriptions");if(!r.ok)return;const d=await r.json();allUsers=d.users||[];renderSubscriptions();}catch{}}
+function renderSubscriptions(){const root=$("#subscriptionRows");const pending=allUsers.filter(u=>u.subscriptionRequest?.status==="pending");if(!pending.length){root.innerHTML='<div class="empty-logs">Нет ожидающих запросов на подписку.</div>';return;}root.innerHTML=pending.map(u=>`<div class="subscription-row"><div><strong>${esc(u.fullName)}</strong><small>Запрошен тариф ${esc((u.subscriptionRequest.plan||"").toUpperCase())} · ${esc(fmtTime(u.subscriptionRequest.requestedAt))}</small></div><button data-approve="${esc(u.id)}" data-tier="${esc(u.subscriptionRequest.plan)}">Подтвердить оплату</button></div>`).join("");root.querySelectorAll("[data-approve]").forEach(b=>b.onclick=async()=>{b.disabled=true;try{const r=await fetch(`/api/developer/subscriptions/${encodeURIComponent(b.dataset.approve)}/approve`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({plan:b.dataset.tier})});const d=await r.json();if(!r.ok)throw Error(d.error||"Не удалось активировать");toast("Подписка активирована");await loadSubscriptions();}catch(e){toast(e.message);b.disabled=false;}});}
+function render(){const q=$("#filter").value.trim().toLocaleLowerCase("ru");const logs=allLogs.filter(l=>(l.user+" "+l.model+" "+(l.error||"")).toLocaleLowerCase("ru").includes(q));$("#rows").innerHTML=logs.map(l=>`<tr><td>${esc(fmtTime(l.time))}</td><td>${esc(l.user)}</td><td>${esc(l.model)}</td><td>${esc(duration(l.durationMs||0))}</td><td>${(l.inputChars||0).toLocaleString("ru-RU")}</td><td>${(l.outputChars||0).toLocaleString("ru-RU")}</td><td><span class="status-pill ${l.status==="success"?"success":"error"}">${l.status==="success"?"Успешно":"Ошибка"}</span></td><td title="${esc(l.error||"")}">${esc(l.error||"—")}</td></tr>`).join("");$("#empty").hidden=logs.length>0;}
+$("#devLogin").addEventListener("submit",async e=>{e.preventDefault();const b=e.submitter;b.disabled=true;try{const r=await fetch("/api/developer/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:$("#devPassword").value})});const d=await r.json();if(!r.ok)throw Error(d.error||"Ошибка входа");$("#devPassword").value="";await load();}catch(err){$("#devError").textContent=err.message;}finally{b.disabled=false;}});
+$("#refresh").onclick=load;$("#filter").addEventListener("input",render);$("#clearFilter").onclick=()=>{$("#filter").value="";render();};$("#back").onclick=()=>location.href="/";$("#logout").onclick=async()=>{await fetch("/api/developer/logout",{method:"POST"});$("#dashboard").hidden=true;$("#loginView").hidden=false;toast("Вы вышли из панели.");};
+$("#export").onclick=()=>{const headers=["Время","Пользователь","Модель","Длительность, мс","Входные символы","Выходные символы","Статус","Ошибка"];const lines=[headers,...allLogs.map(l=>[fmtTime(l.time),l.user,l.model,l.durationMs,l.inputChars,l.outputChars,l.status,l.error||""])].map(row=>row.map(v=>'"'+String(v??"").replace(/"/g,'""')+'"').join(";"));const blob=new Blob(["\ufeff"+lines.join("\r\n")],{type:"text/csv;charset=utf-8"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="teachergpt-requests.csv";a.click();URL.revokeObjectURL(a.href);};
+load();
+</script></body></html>

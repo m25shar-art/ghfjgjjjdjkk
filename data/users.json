@@ -1,0 +1,14 @@
+[
+  {
+    "id": "f014643a-bd8f-4cbb-97a9-c4a3c344d841",
+    "fullName": "Шарапов Марк Олегович",
+    "passwordHash": "$2a$12$O1fEuQ4w0QI3XW8TsKYnwObtlAi61s/qW0p8i1ze2mt0.p/Sq7F1u",
+    "createdAt": "2026-10-25T19:05:11.804Z",
+    "plan": "free",
+    "subscriptionRequest": {
+      "plan": "pro",
+      "requestedAt": "2026-10-25T19:05:44.070Z",
+      "status": "pending"
+    }
+  }
+]

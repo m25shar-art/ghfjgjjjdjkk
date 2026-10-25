@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fbfaf8">
+  <meta name="description" content="УчительGPT — ИИ-помощник для учителей и преподавателей.">
+  <title>УчительGPT — ИИ для учителей</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <div class="brand-row">
+      <a class="brand" href="/" aria-label="УчительGPT">УчительGPT</a>
+      <button class="icon-button mobile-close" id="closeSidebar" aria-label="Закрыть меню">×</button>
+      <button class="icon-button" id="toggleSidebar" title="Свернуть меню" aria-label="Свернуть меню">◧</button>
+      <button class="icon-button" id="searchChats" title="Поиск по чатам" aria-label="Поиск">⌕</button>
+    </div>
+    <button class="new-chat" id="newChat"><span class="plus">＋</span> Новый чат</button>
+    <nav class="main-nav">
+      <button class="nav-item" data-static="Проекты"><span>▱</span> Проекты</button>
+      <button class="nav-item" id="toolsButton"><span>✧</span> Инструменты для уроков</button>
+      <button class="nav-item" id="subscriptionButton"><span>✧</span> Подписка</button>
+      <button class="nav-item" id="settingsButton"><span>⚙</span> Настройки</button>
+      <button class="nav-item" id="developerLink"><span>⌘</span> Для разработчика</button>
+    </nav>
+    <div class="history-head"><span>Чаты и задачи</span><button class="icon-button" id="historyFilter" aria-label="Фильтр чатов">☷</button></div>
+    <div class="chat-history" id="chatHistory"></div>
+    <div class="sidebar-footer">
+      <div class="school-mark">✳</div>
+      <div><strong>УчительGPT</strong><small>Помощник педагога</small></div>
+      <button class="icon-button" id="profileButton" aria-label="Профиль">⌄</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <button class="icon-button mobile-menu" id="openSidebar" aria-label="Открыть меню">☰</button>
+      <div class="conversation-title" id="conversationTitle">Новый чат <span>⌄</span></div>
+      <div class="topbar-right"><span class="plan-pill" id="planPill">Бесплатный план</span><button class="share-button" id="shareButton">Поделиться</button></div>
+    </header>
+
+    <section class="welcome" id="welcome">
+      <div class="welcome-heading"><span class="spark">✳</span><h1>Добрый вечер!</h1></div>
+      <p class="welcome-subtitle">Чем займёмся сегодня?</p>
+      <div class="composer welcome-composer">
+        <textarea id="welcomeInput" rows="2" placeholder="Напишите, что нужно подготовить…"></textarea>
+        <div class="composer-bottom">
+          <button class="icon-button attach" id="attachButton" title="Загрузить учебник PDF или DOCX" aria-label="Прикрепить">＋</button>
+          <div class="mode-tabs"><button class="mode active" data-mode="chat">Чат</button><button class="mode" data-mode="work">Работа</button></div>
+          <div class="composer-spacer"></div>
+          <div class="model-picker" id="pickerWelcome"><button class="model-trigger" type="button"><span class="model-trigger-name">Claude Haiku 5.5</span><span class="model-trigger-chevron">⌄</span></button><div class="model-menu" hidden></div></div>
+          <button class="send-button" id="welcomeSend" aria-label="Отправить">↑</button>
+        </div>
+      </div>
+      <input id="documentInput" type="file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" hidden><div class="document-status" id="documentStatus" hidden></div><div class="quick-actions">
+        <button data-prompt="Составь подробный план урока по теме … для … класса. Добавь цели, этапы и задания.">✎ План урока</button>
+        <button data-prompt="Объясни тему простым языком для школьников и приведи понятные примеры: …">⌁ Объяснить тему</button>
+        <button data-prompt="Подготовь проверочную работу по предмету … для … класса: задания разного уровня и ответы отдельно.">▤ Проверочная</button>
+        <button data-prompt="Напиши сценарий школьного мероприятия на тему … с репликами ведущих и таймингом.">♧ Сценарий</button>
+        <button data-prompt="Помоги придумать интересные задания и активности для урока по теме …">✧ Идеи для урока</button>
+      </div>
+      <div class="school-note">Сделано специально для учителей школы<br><strong>«МБОУ „Центр образования „Перспектива““»</strong></div>
+    </section>
+
+    <section class="chat-view hidden" id="chatView">
+      <div class="messages" id="messages"></div>
+      <div class="composer chat-composer">
+        <textarea id="chatInput" rows="1" placeholder="Напишите сообщение…"></textarea>
+        <div class="composer-bottom">
+          <button class="icon-button attach" id="chatAttach" title="Загрузить учебник PDF или DOCX" aria-label="Прикрепить">＋</button>
+          <div class="mode-tabs"><button class="mode active" data-mode="chat">Чат</button><button class="mode" data-mode="work">Работа</button></div>
+          <div class="composer-spacer"></div>
+          <div class="model-picker" id="pickerChat"><button class="model-trigger" type="button"><span class="model-trigger-name">Claude Haiku 5.5</span><span class="model-trigger-chevron">⌄</span></button><div class="model-menu" hidden></div></div>
+          <button class="send-button" id="chatSend" aria-label="Отправить">↑</button>
+        </div>
+      </div>
+      <p class="disclaimer">ИИ может ошибаться. Проверяйте важные сведения перед использованием на уроке.</p>
+    </section>
+  </main>
+  <div class="toast" id="toast" role="status"></div>
+  <div class="modal-backdrop" id="toolsModal" hidden><section class="modal-card tools-card"><button class="modal-close" data-close="toolsModal">×</button><p class="eyebrow">Инструменты педагога</p><h2>Что подготовим?</h2><div class="tool-grid"><button data-tool="Составь подробный конспект урока. Укажи предмет, класс, тему, цели, оборудование, этапы, деятельность учителя и учеников, рефлексию и домашнее задание.">Конспект урока</button><button data-tool="Создай проверочную работу для школьников: задания разного уровня, отдельный ключ ответов и критерии оценивания.">Тест и проверочная</button><button data-tool="Подготовь рабочий лист по теме с инструкцией, заданиями разных типов и местом для ответов.">Рабочий лист</button><button data-tool="Напиши сценарий школьного праздника с ведущими, репликами, таймингом и необходимым реквизитом.">Сценарий мероприятия</button><button data-tool="Составь план воспитательного мероприятия с целями, ходом, активностями и итоговой рефлексией.">План мероприятия</button><button data-tool="Подготовь содержание презентации на 8–10 слайдов: заголовок и тезисы каждого слайда, вступление и вывод. Если нужен файл, напиши «создай PPTX».">План презентации</button></div><p class="small-note">Укажите предмет, класс и тему в чате после выбора инструмента.</p></section></div>
+  <div class="modal-backdrop" id="subscriptionModal" hidden><section class="modal-card"><button class="modal-close" data-close="subscriptionModal">×</button><p class="eyebrow">УчительGPT</p><h2>Выберите подписку</h2><p class="modal-description">Оплата производится вручную. После оплаты разработчик подтвердит подписку.</p><div class="plan-grid"><article class="plan-card"><span class="plan-label">PLUS</span><h3>129 ₽ <small>/ месяц</small></h3><p>Доступ к моделям Plus и всем бесплатным моделям.</p><button data-plan="plus" class="plan-choose">Выбрать Plus</button></article><article class="plan-card featured"><span class="plan-label">PRO</span><h3>299 ₽ <small>/ месяц</small></h3><p>Модели Pro и создание файлов PDF, DOCX, TXT и PPTX.</p><button data-plan="pro" class="plan-choose">Выбрать Pro</button></article></div><div class="payment-instructions"><strong>Как оплатить</strong><p>Передайте оплату наличными Татьяне Игоревне Кузюковой (кабинет 204) либо Шарапову Марку Олеговичу из 7 «З».</p><p class="small-note">После оплаты отправьте запрос на активацию. Доступ включается разработчиком вручную.</p></div><div id="subscriptionStatus" class="subscription-status"></div></section></div>
+  <div class="modal-backdrop" id="settingsModal" hidden><section class="modal-card compact-modal"><button class="modal-close" data-close="settingsModal">×</button><p class="eyebrow">Настройки</p><h2>Ваш аккаунт</h2><p id="accountName"></p><button id="logoutButton" class="plan-choose secondary">Выйти из аккаунта</button></section></div>
+  <script src="/app.js"></script>
+</body>
+</html>
